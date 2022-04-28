@@ -1,5 +1,5 @@
 <?
-namespace KDH;
+namespace Bogdo;
 
 class EventHandler {
 
@@ -8,7 +8,7 @@ class EventHandler {
 	}
 
 	public static function OnEpilog(){
-		var_dump("test01110111");
+		\Bogdo\Debug::showLog();
 	}
 }
 

@@ -1,8 +1,8 @@
 <?
 
 \Bitrix\Main\Loader::registerAutoLoadClasses(
-	"kvv.devhelp",
+	"kvv.bogdo",
 	array(
-		'KDH\EventHandler' => 'KDH/EventHandler.php'
+		'Bogdo\EventHandler' => 'Bogdo/EventHandler.php'
 	)
 );

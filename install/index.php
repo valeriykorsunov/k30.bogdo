@@ -5,7 +5,7 @@ use Bitrix\Main\Localization\Loc;
 use Bitrix\Main\ModuleManager;
 
 Loc::loadMessages(__FILE__);
-class kvv_devhelp extends CModule
+class kvv_bogdo extends CModule
 {
 
 	function __construct()
@@ -13,15 +13,14 @@ class kvv_devhelp extends CModule
 		$arModuleVersion = array();
 		include(__DIR__ . '/version.php');
 
-
-		$this->MODULE_ID = 'kvv.devhelp';
+		$this->MODULE_ID = 'kvv.bogdo';
 		$this->MODULE_VERSION = $arModuleVersion["VERSION"];
 		$this->MODULE_VERSION_DATE = $arModuleVersion["VERSION_DATE"];
-		$this->MODULE_NAME = Loc::getMessage("KVV_DEVHELP_MODULE_NAME"); // имя модуля
-		$this->MODULE_DESCRIPTION = Loc::getMessage("KVV_DEVHELP_MODULE_DESCRIPTION"); // описание модуля
+		$this->MODULE_NAME = Loc::getMessage("KVV_BOGDO_MODULE_NAME"); // имя модуля
+		$this->MODULE_DESCRIPTION = Loc::getMessage("KVV_BOGDO_MODULE_DESCRIPTION"); // описание модуля
 
-		$this->PARTNER_NAME = Loc::getMessage("KVV_DEVHELP_PARTNER_NAME");
-		$this->PARTNER_URI = Loc::getMessage("KVV_DEVHELP_PARTNER_URI");
+		$this->PARTNER_NAME = Loc::getMessage("KVV_BOGDO_PARTNER_NAME");
+		$this->PARTNER_URI = Loc::getMessage("KVV_BOGDO_PARTNER_URI");
 
 		$this->MODULE_SORT = 1;
 		$this->SHOW_SUPER_ADMIN_GROUP_RIGHTS = 'Y';
@@ -37,10 +36,10 @@ class kvv_devhelp extends CModule
 			\Bitrix\Main\Loader::includeModule($this->MODULE_ID);
 			$this->editHandler("install");
 		} else {
-			$APPLICATION->ThrowException(Loc::getMessage("KVV_DEVHELP_ERROR_VERSION_D7"));
+			$APPLICATION->ThrowException(Loc::getMessage("KVV_BOGDO_ERROR_VERSION_D7"));
 		}
 
-		$APPLICATION->IncludeAdminFile(Loc::getMessage("KVV_DEVHELP_INSTALL_TITLE"), $this->GetPath() . "/install/step.php");
+		$APPLICATION->IncludeAdminFile(Loc::getMessage("KVV_BOGDO_INSTALL_TITLE"), $this->GetPath() . "/install/step.php");
 	}
 
 	function DoUninstall()
@@ -51,7 +50,7 @@ class kvv_devhelp extends CModule
 		$request = $context->getRequest();
 
 		if ($request["step"] < 2) {
-			$APPLICATION->IncludeAdminFile(Loc::getMessage("KVV_DEVHELP_UNINSTALL_TITLE"), $this->GetPath() . "/install/unstep1.php");
+			$APPLICATION->IncludeAdminFile(Loc::getMessage("KVV_BOGDO_UNINSTALL_TITLE"), $this->GetPath() . "/install/unstep1.php");
 		} elseif ($request["step"] == 2) {
 			if ($request["savedata"] != "Y") {
 				// удвлить данные из БД
@@ -60,7 +59,7 @@ class kvv_devhelp extends CModule
 			$this->editHandler("uninstall");
 
 			ModuleManager::unRegisterModule($this->MODULE_ID);
-			$APPLICATION->IncludeAdminFile(Loc::getMessage("KVV_DEVHELP_UNINSTALL_TITLE"), $this->GetPath() . "/install/unstep2.php");
+			$APPLICATION->IncludeAdminFile(Loc::getMessage("KVV_BOGDO_UNINSTALL_TITLE"), $this->GetPath() . "/install/unstep2.php");
 		}
 	}
 
@@ -104,7 +103,7 @@ class kvv_devhelp extends CModule
 			$params["ModuleId"],
 			$params["Event"],
 			$this->MODULE_ID,
-			'\KDH\EventHandler',
+			'\Bogdo\EventHandler',
 			$params["Event"],
 			$params["Sort"]
 		);
@@ -118,7 +117,7 @@ class kvv_devhelp extends CModule
 			$params["ModuleId"],
 			$params["Event"],
 			$this->MODULE_ID,
-			'\KDH\EventHandler',
+			'\Bogdo\EventHandler',
 			$params["Event"]
 		);
 	}
