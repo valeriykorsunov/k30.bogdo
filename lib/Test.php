@@ -4,9 +4,9 @@ namespace K30\Bogdo;
 
 class Test
 {
-	static function console()
+	static function dump($data)
 	{
-		var_dump('TEST');
+		echo"<pre>"; var_dump($data); echo "</pre>"; exit;
 	}
 }
 ?>

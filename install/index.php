@@ -106,7 +106,7 @@ class k30_bogdo extends CModule
 		{
 			foreach ($listHendler as $params)
 			{
-				$this->registerHandler($params);
+				$this->unregisterHandler($params);
 			}
 		}
 	}
