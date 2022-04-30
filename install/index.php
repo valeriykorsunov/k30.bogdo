@@ -25,6 +25,8 @@ class k30_bogdo extends CModule
 		$this->MODULE_SORT = 1;
 		$this->SHOW_SUPER_ADMIN_GROUP_RIGHTS = 'Y';
 		$this->MODULE_GROUP_RIGHTS = 'Y';  //используем ли индивидуальную схему распределения прав доступа
+
+		$this->NAME_DIRECTORY = substr(strrchr(dirname(__DIR__, 3), "/"), 1); // local или bitrix
 	}
 
 	function DoInstall()
@@ -36,6 +38,7 @@ class k30_bogdo extends CModule
 
 			\Bitrix\Main\Loader::includeModule($this->MODULE_ID);
 			$this->editHandler("install");
+			$this->editFiles("install");
 		}
 		else
 		{
@@ -64,6 +67,7 @@ class k30_bogdo extends CModule
 			}
 
 			$this->editHandler("uninstall");
+			$this->editFiles("uninstall");
 
 			ModuleManager::unRegisterModule($this->MODULE_ID);
 			$APPLICATION->IncludeAdminFile(Loc::getMessage("K30_BOGDO_UNINSTALL_TITLE"), $this->GetPath() . "/install/unstep2.php");
@@ -77,7 +81,7 @@ class k30_bogdo extends CModule
 
 	protected function isVersionPhp($version = '7.4')
 	{
-		return (phpversion()*10 >= $version*10);
+		return (phpversion() * 10 >= $version * 10);
 	}
 
 	protected function GetPath($notDocumentRoot = false)
@@ -88,29 +92,32 @@ class k30_bogdo extends CModule
 			return dirname(__DIR__);
 	}
 
-	protected function editHandler($typeAction)
+	/**
+	 * Обработчик событий
+	 *
+	 * @param [string] $typeAction
+	 * @return bool
+	 */
+	protected function editHandler(string $typeAction)
 	{
 		$listHendler = array(
 			["ModuleId" => "main", "Event" => "onPageStart", "Sort" => "100"],
 			["ModuleId" => "main", "Event" => "OnEpilog", "Sort" => "100"],
 		);
 
-		if ($typeAction == "install")
+		foreach ($listHendler as $params)
 		{
-			foreach ($listHendler as $params)
+			if ($typeAction == "install")
 			{
 				$this->registerHandler($params);
 			}
-		}
-		if ($typeAction == "uninstall")
-		{
-			foreach ($listHendler as $params)
+			if ($typeAction == "uninstall")
 			{
 				$this->unregisterHandler($params);
 			}
 		}
+		return	true;
 	}
-
 	protected function registerHandler(array $params)
 	{
 		if (!isset($params["ModuleId"], $params["Event"], $params["Sort"])) return false; // TODO зафиксировать как ошибку.
@@ -123,9 +130,9 @@ class k30_bogdo extends CModule
 			$params["Event"],
 			$params["Sort"]
 		);
+		return true;
 	}
-
-	protected function unregisterHandler($params)
+	protected function unregisterHandler(array $params)
 	{
 		if (!isset($params["ModuleId"], $params["Event"], $params["Sort"])) return false; // TODO зафиксировать как ошибку.
 
@@ -136,5 +143,48 @@ class k30_bogdo extends CModule
 			'K30\Bogdo\EventHandler',
 			$params["Event"]
 		);
+		return true;
+	}
+
+	/**
+	 * Обработчик файлов
+	 *
+	 * @param string $typeAction
+	 * @return void
+	 */
+	protected function editFiles(string $typeAction)
+	{
+		$arrayFilePath = [
+			["from" => $this->GetPath() . "/install/admin/", "to" => $_SERVER["DOCUMENT_ROOT"] . "/bitrix/admin", "recursive" => false]
+		];
+
+		foreach ($arrayFilePath as $arPath)
+		{
+			if ($typeAction == "install")
+			{
+				$this->filesInstall($arPath["from"], $arPath["to"], $arPath["recursive"]);
+			}
+			if ($typeAction == "uninstall")
+			{
+				$this->filesUninstall($arPath["from"], $arPath["to"], $arPath["recursive"]);
+			}
+		}
+		return true;
+	}
+	protected function filesInstall(string $path_from, string $path_to, bool $recursive = false)
+	{
+		CopyDirFiles($path_from, $path_to, true, $recursive);
+		return true;
+	}
+	protected function filesUninstall(string $path_from = "", string $path_to, bool $recursive = false)
+	{
+		if ($recursive)
+		{
+			DeleteDirFilesEx($path_to);
+			return true;
+		}
+
+		DeleteDirFiles($path_from, $path_to);
+		return true;
 	}
 }

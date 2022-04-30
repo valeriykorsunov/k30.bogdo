@@ -6,7 +6,7 @@ class Test
 {
 	static function dump($data)
 	{
-		echo"<pre>"; var_dump($data); echo "</pre>"; exit;
+		echo"<pre>"; var_dump(substr(strrchr(dirname(__DIR__,3),"/"),1)); echo "</pre>";
 	}
 }
 ?>
