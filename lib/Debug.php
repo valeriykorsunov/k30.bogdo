@@ -39,8 +39,8 @@ class Debug
 		$backtrace = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 7);
 
 		$dataJson = [
-			"BACKTRACE" => $backtrace,
-			"DATA"=>$data
+			"DATA"=>$data,
+			"BACKTRACE" => $backtrace
 		];
 	
 		$json = json_encode(unserialize(str_replace(
@@ -76,3 +76,5 @@ class Debug
 		}		
 	}
 }
+
+?>

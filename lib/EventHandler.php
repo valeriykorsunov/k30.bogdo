@@ -1,5 +1,5 @@
 <?
-namespace Bogdo;
+namespace K30\Bogdo;
 
 class EventHandler {
 
@@ -12,3 +12,4 @@ class EventHandler {
 	}
 }
 
+?>
