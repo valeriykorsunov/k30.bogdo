@@ -1,8 +1,10 @@
 <?
 
+use Bitrix\Main\Loader;
 use Bitrix\Main\Application;
-use Bitrix\Main\Localization\Loc;
 use Bitrix\Main\ModuleManager;
+use Bitrix\Main\Entity\Base;
+use Bitrix\Main\Localization\Loc;
 
 Loc::loadMessages(__FILE__);
 class k30_bogdo extends CModule
@@ -36,7 +38,8 @@ class k30_bogdo extends CModule
 		{
 			ModuleManager::registerModule($this->MODULE_ID);
 
-			\Bitrix\Main\Loader::includeModule($this->MODULE_ID);
+			Loader::includeModule($this->MODULE_ID);
+			$this->InstallDB();
 			$this->editHandler("install");
 			$this->editFiles("install");
 		}
@@ -63,7 +66,7 @@ class k30_bogdo extends CModule
 		{
 			if ($request["savedata"] != "Y")
 			{
-				// удвлить данные из БД
+				$this->UnInstallDB();
 			}
 
 			$this->editHandler("uninstall");
@@ -72,6 +75,26 @@ class k30_bogdo extends CModule
 			ModuleManager::unRegisterModule($this->MODULE_ID);
 			$APPLICATION->IncludeAdminFile(Loc::getMessage("K30_BOGDO_UNINSTALL_TITLE"), $this->GetPath() . "/install/unstep2.php");
 		}
+	}
+
+	function InstallDB()
+    {
+		Loader::includeModule($this->MODULE_ID);
+
+        if(!Application::getConnection(\K30\Bogdo\TabsTable::getConnectionName())->isTableExists(
+            Base::getInstance('\K30\Bogdo\TabsTable')->getDBTableName()
+            )
+        )
+        {
+            Base::getInstance('\K30\Bogdo\TabsTable')->createDbTable();
+        }
+	}
+	function UnInstallDB()
+	{
+        Loader::includeModule($this->MODULE_ID);
+
+        Application::getConnection(\K30\Bogdo\TabsTable::getConnectionName())->
+            queryExecute('drop table if exists '.Base::getInstance('\K30\Bogdo\TabsTable')->getDBTableName());
 	}
 
 	protected function isVersionD7()
