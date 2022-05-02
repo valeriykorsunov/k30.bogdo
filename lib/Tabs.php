@@ -1,8 +1,8 @@
 <?
 namespace K30\Bogdo;
 
-use \Bitrix\Main\Entity;
 use Bitrix\Main\ORM;
+use Bitrix\Main\ORM\Query\Join;
 
 class TabsTable extends ORM\Data\DataManager
 {
@@ -26,10 +26,7 @@ class TabsTable extends ORM\Data\DataManager
 			// сортировка
 			new ORM\Fields\IntegerField('SORT',array(
 				'default_value' => 100
-			)),
-
-			// пользовательские свойства
-			new ORM\Fields\Relations\OneToMany('USERS_PROPERTIES', \Bitrix\Main\UserFieldTable::class, 'K30_BOGDO_SETTINGS')
+			))
         );
 	}
 }

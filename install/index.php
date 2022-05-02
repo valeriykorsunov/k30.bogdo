@@ -81,20 +81,22 @@ class k30_bogdo extends CModule
     {
 		Loader::includeModule($this->MODULE_ID);
 
-        if(!Application::getConnection(\K30\Bogdo\TabsTable::getConnectionName())->isTableExists(
-            Base::getInstance('\K30\Bogdo\TabsTable')->getDBTableName()
-            )
-        )
+        if(!Application::getConnection(\K30\Bogdo\TabsTable::getConnectionName())->isTableExists(Base::getInstance('\K30\Bogdo\TabsTable')->getDBTableName()))
         {
             Base::getInstance('\K30\Bogdo\TabsTable')->createDbTable();
+        }
+        if(!Application::getConnection(\K30\Bogdo\TabsUserFieldUsTable::getConnectionName())->isTableExists(Base::getInstance('\K30\Bogdo\TabsUserFieldUsTable')->getDBTableName()))
+        {
+            Base::getInstance('\K30\Bogdo\TabsUserFieldUsTable')->createDbTable();
         }
 	}
 	function UnInstallDB()
 	{
         Loader::includeModule($this->MODULE_ID);
 
-        Application::getConnection(\K30\Bogdo\TabsTable::getConnectionName())->
-            queryExecute('drop table if exists '.Base::getInstance('\K30\Bogdo\TabsTable')->getDBTableName());
+        Application::getConnection(\K30\Bogdo\TabsTable::getConnectionName())->queryExecute('drop table if exists '.Base::getInstance('\K30\Bogdo\TabsTable')->getDBTableName());
+
+        Application::getConnection(\K30\Bogdo\TabsUserFieldUsTable::getConnectionName())->queryExecute('drop table if exists '.Base::getInstance('\K30\Bogdo\TabsUserFieldUsTable')->getDBTableName());
 	}
 
 	protected function isVersionD7()
