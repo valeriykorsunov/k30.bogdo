@@ -85,11 +85,13 @@ class k30_bogdo extends CModule
         {
             Base::getInstance('\K30\Bogdo\TabsTable')->createDbTable();
         }
+		
         if(!Application::getConnection(\K30\Bogdo\TabsUserFieldUsTable::getConnectionName())->isTableExists(Base::getInstance('\K30\Bogdo\TabsUserFieldUsTable')->getDBTableName()))
         {
             Base::getInstance('\K30\Bogdo\TabsUserFieldUsTable')->createDbTable();
         }
 	}
+	
 	function UnInstallDB()
 	{
         Loader::includeModule($this->MODULE_ID);

@@ -20,9 +20,6 @@ if (!$RIGHT_R)
 	$APPLICATION->AuthForm(GetMessage("ACCESS_DENIED"));
 }
 
-global $USER_FIELD_MANAGER, $APPLICATION;
-
-
 
 // TODO переделать request через ядро битрикса. Обновление данных
 if (
@@ -52,17 +49,6 @@ if (
 $APPLICATION->SetTitle("Настройки сайта");
 require($_SERVER["DOCUMENT_ROOT"] . "/bitrix/modules/main/include/prolog_admin_after.php");
 ?>
-
-<!-- TODO  перенести в настройки модуля -->
-	<?= BeginNote(); ?>
-	<br><strong>&lt;?echo \COption::GetOptionString( &quot;askaron.settings&quot;, &quot;UF_PHONE&quot;);?&gt;</strong>
-	<br><strong>&lt;?$email = \COption::GetOptionString( &quot;askaron.settings&quot;, &quot;UF_EMAIL&quot;);?&gt;</strong>
-	<br>D7:
-	<br><strong>&lt;?echo \Bitrix\Main\Config\Option::get( &quot;askaron.settings&quot;, &quot;UF_PHONE&quot;);?&gt;</strong>
-	<br><strong>&lt;?$email = \Bitrix\Main\Config\Option::get( &quot;askaron.settings&quot;, &quot;UF_EMAIL&quot;);?&gt;</strong>
-	<?= EndNote(); ?>
-	<a href="/bitrix/admin/userfield_edit.php?lang=<?= LANGUAGE_ID ?>&amp;ENTITY_ID=K30_BOGDO_SETTINGS&amp;back_url=<?= urlencode($APPLICATION->GetCurPageParam() . '&tabControl_active_tab=user_fields_tab') ?>">Добавить настройку</a>
-<!-- Конец -  перенести в настройки модуля -->
 
 <? if (isset($_REQUEST["ok"]) && $_REQUEST["ok"] == "Y") : ?>
 	<?
