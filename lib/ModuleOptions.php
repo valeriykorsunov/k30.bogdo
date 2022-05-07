@@ -48,6 +48,30 @@ class ModuleOptions
 				font-weight: bold;
 			}
 
+			#optionsTab table.gcustomsettings-settings-tab-headers thead td:nth-child(1) {
+				min-width: 30px;
+			}
+
+			#optionsTab table.gcustomsettings-settings-tab-headers thead td:nth-child(2) {
+				min-width: 200px;
+			}
+
+			.gcustomsettings-settings-tab-headers.options-tab thead td:nth-child(1) {
+				min-width: 300px;
+			}
+
+			.gcustomsettings-settings-tab-headers.options-tab thead td:nth-child(2) {
+				min-width: 50px;
+			}
+
+			.gcustomsettings-settings-tab-headers.options-tab thead td:nth-child(3) {
+				width: 70px;
+			}
+
+			.gcustomsettings-settings-tab-headers.options-tab thead td:nth-child(4) {
+				min-width: 30px;
+			}
+
 			table.gcustomsettings-settings-tab-headers td {
 				border: 1px solid rgb(208, 215, 216) !important;
 				padding: 3px !important;
@@ -56,18 +80,166 @@ class ModuleOptions
 			.redLink {
 				color: red;
 			}
+
+			.tab-param {
+				border: 1px solid rgb(208, 215, 216);
+			}
+
+			.tab-param div {
+				padding: 10px;
+			}
 		</style>
 	<?
 	}
 
 	public static function ShowJS()
 	{
-		?>
+	?>
 		<script>
-			function addNewTabs(e){
-				alert("test");
+			function editTab(elem) {
+				// console.log(elem.getAttribute("data-tabname"));
+
+				let popup = new BX.CDialog({
+					'content_url': '<?= self::GetPath(true) ?>/ajax/formOptionTab.php',
+					'content_post': 'tabname=' + elem.getAttribute("data-tabname") + '&ID_TAB=' + elem.getAttribute("data-tabid")
+				});
+
+				popup.Show();
+
+				BX.addCustomEvent(popup, 'onWindowClose', function() {
+					if (document.querySelector('#optionsTab input[name="save"]').value == "Y") {
+						window.location.reload();
+					}
+				});
 			}
+
+			// function dellTab(elem){
+			// 	let popup = new BX.CDialog({
+			// 		'buttons': [BX.CDialog.btnSave, BX.CDialog.btnCancel],
+			// 		'draggable': true,
+			// 		'resizable': true,
+			// 		'width':300,
+          	// 		'height':100,
+			// 		'content': '<form method="POST" id="form_delete">\
+			// 								<input type="hidden" name="ID_TAB" value="'+elem.getAttribute("data-tabid")+'">\
+			// 								<input type="hidden" name="DELETE" value="Y">\
+			// 								<h1> Подтверждение удаления вкладки. <h1>\
+			// 								<input type="hidden" name="sessid" value="'+BX.bitrix_sessid()+'"></form>',
+			// 	});
+
+			// 	popup.Show();
+			// }
 		</script>
+	<?
+	}
+
+	public static function ShowJSformOptionTab()
+	{
+	?>
 		<?
+		// если мы окном рисуем с кнопками (передаем массив кнопок), то после сабмита они исчезают.
+		// Решается установкой кнопок в теле (в прилетаемом контенте) диалога:
+		?>
+		<script type="text/javascript">
+			BX.WindowManager.Get().SetButtons([BX.CDialog.prototype.btnSave, BX.CDialog.prototype.btnCancel]);
+			BX.WindowManager.Get().SetTitle("Настройки вкладки: <?= $_POST["tabname"] ?>");
+		</script>
+<?
+	}
+
+	public static function templateNewTab($params = array("ID" => "new", 'NAME' => '', 'SORT' => 100,))
+	{
+
+		return '
+		<tr class="tab' . $params["ID"] . '">
+			<td>
+				' . $params["NAME"] . '
+			</td>
+			<td>
+				<input type="text" size="6" name="TABS[1][SORT]" value="' . $params["SORT"] . '">
+			</td>
+			<td>
+				<a data-tabname="' . $params["NAME"] . '" data-tabid="' . $params["ID"] . '" href="javascript:void(0)"  onclick="editTab(this);" >Изменить</a>
+			</td>
+			<td>
+				<a class="redLink" href="javascript:void(0)" data-tabid="' . $params["ID"] . '" onclick="dellTab(this);">Удалить</a>
+			</td>
+		</tr>
+		';
+	}
+
+	public static function GetOptionForTabs()
+	{
+	}
+
+	public static function GetOptionForEditTabs()
+	{
+	}
+
+	public static function SetOptionForTabs()
+	{
+	}
+
+	public static function GetTabsList()
+	{
+		$result = array();
+
+		$Tabs = \K30\Bogdo\TabsTable::getEntity();
+		$obTable = (new  \Bitrix\Main\ORM\Query\Query($Tabs))
+			->setSelect(['*'])
+			->exec();
+
+		$result = $obTable->fetchAll();
+
+		return $result;
+	}
+
+	public static function GetTabsInfo($ID)
+	{
+		$result = array();
+
+		$Tabs = \K30\Bogdo\TabsTable::getEntity();
+		$obTable = (new  \Bitrix\Main\ORM\Query\Query($Tabs))
+			->setFilter(["ID" => $ID])
+			->setSelect(['*'])
+			->exec();
+
+		$result = $obTable->fetchAll()[0];
+
+		return $result;
+	}
+
+	public static function AddTab(array $params = array("NAME" => "default name", "SORT" => 100))
+	{
+		$result = \K30\Bogdo\TabsTable::add(array(
+			"NAME" => $params["NAME"],
+			"SORT" => $params["SORT"]
+		));
+
+		if ($result->isSuccess())
+		{
+			return $result->getId();
+		}
+		else
+		{
+			return false;
+		}
+	}
+
+	public static function updateTab($ID, array $params = array("NAME" => "default name", "SORT" => 100))
+	{
+		$result = \K30\Bogdo\TabsTable::update($ID, array(
+			"NAME" => $params["NAME"],
+			"SORT" => $params["SORT"]
+		));
+
+		return $result;
+	}
+
+	public static function deleteTab($ID)
+	{
+		$result = \K30\Bogdo\TabsTable::delete($ID);
+
+		return $result;
 	}
 }
