@@ -6,12 +6,6 @@ $request = Bitrix\Main\Context::getCurrent()->getRequest();
 $paramsTab = array();
 $paramsTab["ID_TAB"] = $request["ID_TAB"];
 
-// if($request["DELETE"] == "Y")
-// {
-// 	\K30\Bogdo\ModuleOptions::deleteTab($paramsTab["ID_TAB"]);
-// 	exit;
-// }
-
 if($request["save"] != "" )
 {
 	// Новая вкладка
@@ -49,6 +43,8 @@ else
 	$paramsTab["TAB_NAME"] = $tabInfo["NAME"];
 	$paramsTab["TAB_SORT"] = $tabInfo["SORT"];
 }
+
+$userfieldList = \K30\Bogdo\ModuleOptions::GetUserFieldList();
 ?>
 
 <form method="POST" id="optionsTab">
@@ -61,11 +57,9 @@ else
 		<div>Сортировка: <input type="text" name="sortTab" size="5" value="<?= $paramsTab["TAB_SORT"]?>"> </div>
 	</div>
 	<br>
+
 	<? echo "<pre>";
-	var_dump($_REQUEST);
-	echo "</pre>"; ?>
-	<? echo "<pre>";
-	var_dump($newtab);
+	var_dump($userfieldList);
 	echo "</pre>"; ?>
 
 

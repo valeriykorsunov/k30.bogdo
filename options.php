@@ -38,9 +38,6 @@ $tabControl->Begin();
 	<!-- Вкладки начало -->
 
 	<h2>Управление вкладками:</h2>
-	<? echo"<pre>"; var_dump($_REQUEST); echo "</pre>"; ?>
-	<? echo"<pre>"; var_dump($APPLICATION->GetCurPage()); echo "</pre>"; ?>
-	<? echo"<pre>"; var_dump($userTabList); echo "</pre>"; ?>
 	<tr>
 		<td>
 			<table class="gcustomsettings-settings-tab-headers options-tab" cellspacing="0" cellpadding="0">

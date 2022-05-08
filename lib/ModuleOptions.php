@@ -36,11 +36,13 @@ class ModuleOptions
 	<?
 	}
 
-
 	public static function ShowCSS()
 	{
 	?>
 		<style>
+			table.gcustomsettings-settings-tab-headers td{
+				padding: 10px;				
+			}
 			table.gcustomsettings-settings-tab-headers thead td {
 				background-color: rgb(224, 232, 234);
 				color: rgb(75, 98, 103);
@@ -74,7 +76,7 @@ class ModuleOptions
 
 			table.gcustomsettings-settings-tab-headers td {
 				border: 1px solid rgb(208, 215, 216) !important;
-				padding: 3px !important;
+				/* padding: 3px !important; */
 			}
 
 			.redLink {
@@ -113,22 +115,38 @@ class ModuleOptions
 				});
 			}
 
-			// function dellTab(elem){
-			// 	let popup = new BX.CDialog({
-			// 		'buttons': [BX.CDialog.btnSave, BX.CDialog.btnCancel],
-			// 		'draggable': true,
-			// 		'resizable': true,
-			// 		'width':300,
-          	// 		'height':100,
-			// 		'content': '<form method="POST" id="form_delete">\
-			// 								<input type="hidden" name="ID_TAB" value="'+elem.getAttribute("data-tabid")+'">\
-			// 								<input type="hidden" name="DELETE" value="Y">\
-			// 								<h1> Подтверждение удаления вкладки. <h1>\
-			// 								<input type="hidden" name="sessid" value="'+BX.bitrix_sessid()+'"></form>',
-			// 	});
+			function dellTab(elem) {
+				let popup = new BX.CDialog({
+					'buttons': [{
+							title: "Да",
+							id: 'savebtn',
+							name: 'savebtn',
+							className: BX.browser.IsIE() && BX.browser.IsDoctype() && !BX.browser.IsIE10() ? '' : 'adm-btn-save',
+							action: function() {
+								let form = this.parentWindow.DIV.querySelector('form');
+								let data = new FormData(form);
+								fetch(form.getAttribute("action"), {
+									method: 'POST',
+									body: data
+								})
+									.then((response) => {
+										return response.text();
+									})
+									.then((data) => {
+										window.location.reload();
+									});
+							}
+						},
+						BX.CDialog.btnCancel
+					],
+					'width': 250,
+					'height': 90,
+					'content_url': '<?= self::GetPath(true) ?>/ajax/formTabDelete.php',
+					'content_post': 'ID_TAB=' + elem.getAttribute("data-tabid")
+				});
 
-			// 	popup.Show();
-			// }
+				popup.Show();
+			}
 		</script>
 	<?
 	}
@@ -156,7 +174,7 @@ class ModuleOptions
 				' . $params["NAME"] . '
 			</td>
 			<td>
-				<input type="text" size="6" name="TABS[1][SORT]" value="' . $params["SORT"] . '">
+				' . $params["SORT"] . '
 			</td>
 			<td>
 				<a data-tabname="' . $params["NAME"] . '" data-tabid="' . $params["ID"] . '" href="javascript:void(0)"  onclick="editTab(this);" >Изменить</a>
@@ -187,6 +205,7 @@ class ModuleOptions
 		$Tabs = \K30\Bogdo\TabsTable::getEntity();
 		$obTable = (new  \Bitrix\Main\ORM\Query\Query($Tabs))
 			->setSelect(['*'])
+			->setOrder(['SORT' => 'ASC', 'ID' => 'ASC'])
 			->exec();
 
 		$result = $obTable->fetchAll();
@@ -239,6 +258,25 @@ class ModuleOptions
 	public static function deleteTab($ID)
 	{
 		$result = \K30\Bogdo\TabsTable::delete($ID);
+
+		return $result;
+	}
+
+	public static function GetUserFieldList()
+	{
+		$result = array();
+
+		$Tabs = \Bitrix\Main\UserFieldTable::getEntity();
+		$obTable = (new  \Bitrix\Main\ORM\Query\Query($Tabs))
+			->setSelect(['ID','FIELD_NAME']) // ,'ID_TAB'=>'TABS.ID'
+			->setFilter([
+				"ENTITY_ID" => "K30_BOGDO_SETTINGS"
+			])
+			->set
+			->setOrder(['SORT' => 'ASC', 'ID' => 'ASC'])
+			->exec();
+
+		$result = $obTable->fetchAll();
 
 		return $result;
 	}
