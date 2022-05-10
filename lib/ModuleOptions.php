@@ -248,7 +248,18 @@ class ModuleOptions
 	{
 		$result = \K30\Bogdo\TabsTable::delete($ID);
 
-		return $result;
+		if($result->isSuccess())
+		{
+			$TabsUserFieldUsTable = \K30\Bogdo\TabsUserFieldUsTable::getEntity();
+			$obTable = (new  \Bitrix\Main\ORM\Query\Query($TabsUserFieldUsTable))
+				->setFilter(["ID_TABS" => $ID])
+				->setSelect(['ID'])
+				->exec();
+			while($elem = $obTable->fetch())
+			{
+				\K30\Bogdo\TabsUserFieldUsTable::delete($elem["ID"]);
+			}			
+		}
 	}
 
 	public static function GetUserFieldList()
@@ -265,16 +276,17 @@ class ModuleOptions
 				)))
 				->configureJoinType('left')
 		);
-		$UserFieldTabsEntity->addField(
-			(new Reference(
-				"USER_FIELD_LANG",
-				\Bitrix\Main\UserFieldLangTable::getEntity(),
-				(new \Bitrix\Main\ORM\Query\Filter\ConditionTree)
-					->whereColumn('this.ID','ref.USER_FIELD_ID')
-					->where('ref.LANGUAGE_ID',"=",'ru')
-				))
-				->configureJoinType('left')
-		);
+
+		// $UserFieldTabsEntity->addField(
+		// 	(new Reference(
+		// 		"USER_FIELD_LANG",
+		// 		\Bitrix\Main\UserFieldLangTable::getEntity(),
+		// 		(new \Bitrix\Main\ORM\Query\Filter\ConditionTree)
+		// 			->whereColumn('this.ID','ref.USER_FIELD_ID')
+		// 			->where('ref.LANGUAGE_ID',"=",'ru')
+		// 		))
+		// 		->configureJoinType('left')
+		// );
 
 		$obTable = (new  \Bitrix\Main\ORM\Query\Query($UserFieldTabsEntity))
 			->setSelect(['ID','FIELD_NAME', 'SETTINGS_ID'=>'TABS.SETTINGS_ID', 'USER_FIELD_NAME'=>'USER_FIELD_LANG.EDIT_FORM_LABEL'])
