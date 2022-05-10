@@ -8,7 +8,6 @@ $paramsTab["ID_TAB"] = $request["ID_TAB"];
 
 if($request["save"] != "" )
 {
-	// Новая вкладка
 	if($paramsTab["ID_TAB"] == "new")
 	{
 		if($newtab = \K30\Bogdo\ModuleOptions::AddTab([
@@ -19,14 +18,16 @@ if($request["save"] != "" )
 			$paramsTab["ID_TAB"] = $newtab;
 		};
 	}
-	// обновить вкладку
 	else
 	{
 		\K30\Bogdo\ModuleOptions::updateTab($paramsTab["ID_TAB"], [
 			"NAME" => $request["tabname"],
 			"SORT" => $request["sortTab"]
 		]);
+
 	}
+
+	\K30\Bogdo\ModuleOptions::UpdateUserFieldListforTab($paramsTab["ID_TAB"], $request["select"]);
 }
 if($paramsTab["ID_TAB"] == "new")
 {
@@ -36,7 +37,7 @@ if($paramsTab["ID_TAB"] == "new")
 }
 else
 {
-	// Получить новые данные для формы
+// Получить новые данные для формы
 	$tabInfo = \K30\Bogdo\ModuleOptions::GetTabsInfo($paramsTab["ID_TAB"]);
 
 	$paramsTab["ID_TAB"] = $tabInfo["ID"];
@@ -58,11 +59,6 @@ $userfieldList = \K30\Bogdo\ModuleOptions::GetUserFieldList();
 	</div>
 	<br>
 
-	<? echo "<pre>";
-	var_dump($userfieldList);
-	echo "</pre>"; ?>
-
-
 	<table class="gcustomsettings-settings-tab-headers" cellspacing="0" cellpadding="0">
 		<thead>
 			<tr>
@@ -73,20 +69,22 @@ $userfieldList = \K30\Bogdo\ModuleOptions::GetUserFieldList();
 			</tr>
 		</thead>
 		<tbody class="js-tabs">
+			<?foreach($userfieldList as $field):?>
 			<tr>
 				<td>
-					ИД.........
+					<?= $field["ID"] ?>
 				</td>
 				<td>
-					Название
+				<?= $field["USER_FIELD_NAME"] ?>
 				</td>
 				<td>
-					КОД_КОД
+				<?= $field["FIELD_NAME"] ?>
 				</td>
 				<td>
-					<input type="checkbox" name="select">
+					<input type="checkbox" name="select[<?= $field["ID"] ?>]" <?if($field["SETTINGS_ID"]):?> checked="checked"<?endif?> value="<?= $field["SETTINGS_ID"]?>">
 				</td>
 			</tr>
+			<?endforeach?>
 		</tbody>
 	</table>
 

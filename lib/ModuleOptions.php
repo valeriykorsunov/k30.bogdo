@@ -3,7 +3,8 @@
 namespace K30\Bogdo;
 
 use Bitrix\Main\Application;
-
+use Bitrix\Main\ORM\Fields\Relations\Reference;
+use Bitrix\Main\ORM\Query\Join;
 
 class ModuleOptions
 {
@@ -186,18 +187,6 @@ class ModuleOptions
 		';
 	}
 
-	public static function GetOptionForTabs()
-	{
-	}
-
-	public static function GetOptionForEditTabs()
-	{
-	}
-
-	public static function SetOptionForTabs()
-	{
-	}
-
 	public static function GetTabsList()
 	{
 		$result = array();
@@ -266,18 +255,85 @@ class ModuleOptions
 	{
 		$result = array();
 
-		$Tabs = \Bitrix\Main\UserFieldTable::getEntity();
-		$obTable = (new  \Bitrix\Main\ORM\Query\Query($Tabs))
-			->setSelect(['ID','FIELD_NAME']) // ,'ID_TAB'=>'TABS.ID'
+		$UserFieldTabsEntity = \Bitrix\Main\UserFieldTable::getEntity();
+		$UserFieldTabsEntity->addField(
+			(new Reference(
+				"TABS",
+				\K30\Bogdo\TabsUserFieldUsTable::getEntity(),
+				Join::on(
+					'this.ID','ref.SETTINGS_ID'
+				)))
+				->configureJoinType('left')
+		);
+		$UserFieldTabsEntity->addField(
+			(new Reference(
+				"USER_FIELD_LANG",
+				\Bitrix\Main\UserFieldLangTable::getEntity(),
+				(new \Bitrix\Main\ORM\Query\Filter\ConditionTree)
+					->whereColumn('this.ID','ref.USER_FIELD_ID')
+					->where('ref.LANGUAGE_ID',"=",'ru')
+				))
+				->configureJoinType('left')
+		);
+
+		$obTable = (new  \Bitrix\Main\ORM\Query\Query($UserFieldTabsEntity))
+			->setSelect(['ID','FIELD_NAME', 'SETTINGS_ID'=>'TABS.SETTINGS_ID', 'USER_FIELD_NAME'=>'USER_FIELD_LANG.EDIT_FORM_LABEL'])
 			->setFilter([
 				"ENTITY_ID" => "K30_BOGDO_SETTINGS"
 			])
-			->set
 			->setOrder(['SORT' => 'ASC', 'ID' => 'ASC'])
 			->exec();
 
 		$result = $obTable->fetchAll();
 
 		return $result;
+	}
+
+	public static function UpdateUserFieldListforTab($ID_TAB, array $ID_OPTION)
+	{
+		// добавить 
+		$TabsUserFieldUsTable = \K30\Bogdo\TabsUserFieldUsTable::getEntity();
+		$obTable = (new  \Bitrix\Main\ORM\Query\Query($TabsUserFieldUsTable))
+			->setFilter(["ID_TABS" => $ID_TAB])
+			->setSelect(['*'])
+			->exec();
+
+		$arrayTabsUserFieldUsTable = $obTable->fetchAll();
+
+		global $arTabUFT;
+		$arTabUFT = $arrayTabsUserFieldUsTable;
+
+		$arrayAdd = array_filter(
+			$ID_OPTION,
+			function($v,$k){
+				global $arTabUFT;
+				if(in_array($k,array_column($arTabUFT,"SETTINGS_ID")) or $v!="Y")
+				{
+					return false;
+				}
+				return true;
+			},
+			ARRAY_FILTER_USE_BOTH
+		);
+		foreach ($arrayAdd as $k=>$v)
+		{
+			$addMulty[] = [
+				"SETTINGS_ID" => $k,
+				"ID_TABS" => $ID_TAB
+			];
+		}
+		if($addMulty)
+		{
+			\K30\Bogdo\TabsUserFieldUsTable::addMulti($addMulty);
+		}
+		// удалить
+		foreach ($arTabUFT as $option) 
+		{
+			if(in_array($option["SETTINGS_ID"],array_keys($ID_OPTION)) and $ID_OPTION[$option["SETTINGS_ID"]] != "Y")
+			{
+				// echo"<pre>"; var_dump($option["ID"]); echo "</pre>";
+				\K30\Bogdo\TabsUserFieldUsTable::delete($option["ID"]);
+			}
+		}
 	}
 }
