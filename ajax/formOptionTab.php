@@ -45,7 +45,7 @@ else
 	$paramsTab["TAB_SORT"] = $tabInfo["SORT"];
 }
 
-$userfieldList = \K30\Bogdo\ModuleOptions::GetUserFieldList();
+$userfieldList = \K30\Bogdo\ModuleOptions::GetUserFieldList($paramsTab["ID_TAB"]);
 ?>
 
 <form method="POST" id="optionsTab">

@@ -262,7 +262,7 @@ class ModuleOptions
 		}
 	}
 
-	public static function GetUserFieldList()
+	public static function GetUserFieldList($ID_TAB)
 	{
 		$result = array();
 
@@ -271,22 +271,26 @@ class ModuleOptions
 			(new Reference(
 				"TABS",
 				\K30\Bogdo\TabsUserFieldUsTable::getEntity(),
-				Join::on(
-					'this.ID','ref.SETTINGS_ID'
-				)))
+				// Join::on(
+				// 	'this.ID','ref.SETTINGS_ID'
+				// )
+				(new \Bitrix\Main\ORM\Query\Filter\ConditionTree)
+				->whereColumn('this.ID','ref.SETTINGS_ID')
+				->where('ref.ID_TABS',"=",$ID_TAB)
+				))
 				->configureJoinType('left')
 		);
 
-		// $UserFieldTabsEntity->addField(
-		// 	(new Reference(
-		// 		"USER_FIELD_LANG",
-		// 		\Bitrix\Main\UserFieldLangTable::getEntity(),
-		// 		(new \Bitrix\Main\ORM\Query\Filter\ConditionTree)
-		// 			->whereColumn('this.ID','ref.USER_FIELD_ID')
-		// 			->where('ref.LANGUAGE_ID',"=",'ru')
-		// 		))
-		// 		->configureJoinType('left')
-		// );
+		$UserFieldTabsEntity->addField(
+			(new Reference(
+				"USER_FIELD_LANG",
+				\Bitrix\Main\UserFieldLangTable::getEntity(),
+				(new \Bitrix\Main\ORM\Query\Filter\ConditionTree)
+					->whereColumn('this.ID','ref.USER_FIELD_ID')
+					->where('ref.LANGUAGE_ID',"=",'ru')
+				))
+				->configureJoinType('left')
+		);
 
 		$obTable = (new  \Bitrix\Main\ORM\Query\Query($UserFieldTabsEntity))
 			->setSelect(['ID','FIELD_NAME', 'SETTINGS_ID'=>'TABS.SETTINGS_ID', 'USER_FIELD_NAME'=>'USER_FIELD_LANG.EDIT_FORM_LABEL'])
