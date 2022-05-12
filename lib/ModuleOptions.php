@@ -352,4 +352,15 @@ class ModuleOptions
 			}
 		}
 	}
+
+	public static function GetTabAndUserFieldCode($ID_TAB)
+	{
+		$TabAndUserFieldCode = \K30\Bogdo\TabsUserFieldUsTable::getEntity();
+		$obTable = (new  \Bitrix\Main\ORM\Query\Query($TabAndUserFieldCode))
+			->setFilter(["ID_TABS" => $ID_TAB])
+			->setSelect(['*', 'FIELD_NAME'=>'SETTINGS.FIELD_NAME'])
+			->exec();
+
+			return $obTable->fetchAll();
+	}
 }
