@@ -181,8 +181,11 @@ class k30_bogdo extends CModule
 	 */
 	protected function editFiles(string $typeAction)
 	{
+		CopyDirFiles($_SERVER["DOCUMENT_ROOT"]."/".$this->MY_DIR."/modules/".$this->MODULE_ID."/install/themes/", $_SERVER["DOCUMENT_ROOT"]."/bitrix/themes/", true, true);
+
 		$arrayFilePath = [
-			["from" => $this->GetPath() . "/install/admin/", "to" => $_SERVER["DOCUMENT_ROOT"] . "/bitrix/admin", "recursive" => false]
+			["from" => $this->GetPath() . "/install/admin/", "to" => $_SERVER["DOCUMENT_ROOT"] . "/bitrix/admin", "recursive" => false],
+			["from" => $this->GetPath() . "/install/themes/", "to" => $_SERVER["DOCUMENT_ROOT"] . "/bitrix/themes", "recursive" => true]
 		];
 
 		foreach ($arrayFilePath as $arPath)
