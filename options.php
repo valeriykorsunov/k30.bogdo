@@ -21,7 +21,7 @@ require($_SERVER["DOCUMENT_ROOT"] . "/bitrix/modules/main/include/prolog_admin_a
 <?
 $aTabs = array(
 	array("DIV" => "edit1", "TAB" => "Пользовательские настройки", "ICON" => "", "TITLE" => "Пользовательские настройки"),
-	array("DIV" => "editEnd", "TAB" => "Прочие настройки", "ICON" => "", "TITLE" => "Прочие настройки") // Последняя вкладка настроек, седержит настройки без вкладок
+	// array("DIV" => "editEnd", "TAB" => "Прочие настройки", "ICON" => "", "TITLE" => "Прочие настройки")
 );
 
 $tabControl = new CAdminTabControl("tabControl", $aTabs);
@@ -62,9 +62,10 @@ $tabControl->Begin();
 		</td>
 	</tr>
 	<!-- Конец вкладки -->
+	<?/*?>
 	<? $tabControl->BeginNextTab(); ?>
 	<h2>прочие настройки - содержание</h2>
-
+	<?*/?>
 	<? $tabControl->Buttons(); ?>
 	<input type="submit" name="Update" value="<?= GetMessage("MAIN_SAVE") ?>" title="<?= GetMessage("MAIN_OPT_SAVE_TITLE") ?>">
 	<? $tabControl->End(); ?>

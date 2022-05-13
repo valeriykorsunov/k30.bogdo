@@ -20,8 +20,6 @@ if (!$RIGHT_R)
 	$APPLICATION->AuthForm(GetMessage("ACCESS_DENIED"));
 }
 
-
-// TODO переделать request через ядро битрикса. Обновление данных
 if (
 	$REQUEST_METHOD == "POST"
 	&& strlen($Update) > 0
@@ -30,7 +28,7 @@ if (
 )
 {
 	$arUpdateFields = array();
-	$USER_FIELD_MANAGER->EditFormAddFields("K30_BOGDO_SETTINGS", $arUpdateFields); // fill $arUpdateFields from $_POST and $_FILES
+	$USER_FIELD_MANAGER->EditFormAddFields("K30_BOGDO", $arUpdateFields); // fill $arUpdateFields from $_POST and $_FILES
 
 	$obSettings = new CK30BogdoSetings;
 	$res = $obSettings->Update($arUpdateFields);
@@ -54,7 +52,7 @@ foreach ($userTabList as $tab)
 $arTabs[] = array("DIV" => "editEnd", "TAB" => "Прочие настройки", "ICON" => "", "TITLE" => "Прочие настройки");
 
 $bVarsFromForm = false;
-$arUserFields = $USER_FIELD_MANAGER->GetUserFields("K30_BOGDO_SETTINGS", 1, LANGUAGE_ID);
+$arUserFields = $USER_FIELD_MANAGER->GetUserFields("K30_BOGDO", 1, LANGUAGE_ID);
 /******************************************************************************************************************************** */
 $APPLICATION->SetTitle("Настройки сайта");
 require($_SERVER["DOCUMENT_ROOT"] . "/bitrix/modules/main/include/prolog_admin_after.php");
@@ -86,23 +84,22 @@ require($_SERVER["DOCUMENT_ROOT"] . "/bitrix/modules/main/include/prolog_admin_a
 <? endif ?>
 
 <?
-
-
-
 $tabControl = new CAdminTabControl("tabControl", $arTabs);
 $tabControl->Begin();
 ?>
 <form method="post" action="<? echo $APPLICATION->GetCurPage() ?>?&lang=<?= LANGUAGE_ID ?>" enctype="multipart/form-data">
 	<?= bitrix_sessid_post() ?>
+	<? $deletFields = array(); ?>
 	<? foreach ($tabControl->tabs as $tab) : ?>
 		<?
 		$tabControl->BeginNextTab();
-		$tbFields = \K30\Bogdo\ModuleOptions::GetTabAndUserFieldCode($tab["DIV"])
+		$tbFields = \K30\Bogdo\ModuleOptions::GetTabAndUserFieldCode($tab["DIV"]);
+
 		?>
 		<? foreach ($tbFields as $fieldC) : ?>
 			<?
 			$arUserField = $arUserFields[$fieldC["FIELD_NAME"]];
-			unset($arUserFields[$fieldC["FIELD_NAME"]]);
+			$deletFields[$fieldC["FIELD_NAME"]] = $fieldC["FIELD_NAME"];
 			$arUserField['VALUE_ID'] = 1;
 			?>
 			<tr>
@@ -111,9 +108,16 @@ $tabControl->Begin();
 			<? echo $USER_FIELD_MANAGER->GetEditFormHTML($bVarsFromForm, $GLOBALS[$FIELD_NAME], $arUserField); ?>
 		<? endforeach ?>
 	<? endforeach ?>
+
+
 	<?
-	$tabControl->BeginNextTab();
+	foreach($deletFields as $fn)
+	{
+		unset($arUserFields[$fn]);
+	}
 	?>
+
+	<?//$tabControl->BeginNextTab();?>
 	<? foreach ($arUserFields as $FIELD_NAME => $arUserField) : ?>
 		<? $arUserField['VALUE_ID'] = 1; ?>
 		<tr>

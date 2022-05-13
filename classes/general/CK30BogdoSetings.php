@@ -57,7 +57,7 @@ class CK30BogdoSetings
 		$arResult = array();
 
 		$ID = 1;
-		$entity_id = "K30_BOGDO_SETTINGS";
+		$entity_id = "K30_BOGDO";
 
 		$arUserFields = $USER_FIELD_MANAGER->GetUserFields($entity_id, $ID, LANGUAGE_ID);
 
@@ -85,7 +85,7 @@ class CK30BogdoSetings
 		$this->LAST_ERROR = "";
 
 		$ID = 1;
-		$entity_id = "K30_BOGDO_SETTINGS";
+		$entity_id = "K30_BOGDO";
 
 		$APPLICATION->ResetException();
 		$events = GetModuleEvents("k30.bogdo", "OnBeforeSettingsUpdate");
