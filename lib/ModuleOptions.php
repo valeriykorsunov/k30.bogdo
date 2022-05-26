@@ -342,6 +342,7 @@ class ModuleOptions
 		{
 			\K30\Bogdo\TabsUserFieldUsTable::addMulti($addMulty);
 		}
+		
 		// удалить
 		foreach ($arTabUFT as $option) 
 		{

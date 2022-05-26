@@ -27,7 +27,10 @@ if($request["save"] != "" )
 
 	}
 
-	\K30\Bogdo\ModuleOptions::UpdateUserFieldListforTab($paramsTab["ID_TAB"], $request["select"]);
+	if(is_array($request["select"]))
+	{
+		\K30\Bogdo\ModuleOptions::UpdateUserFieldListforTab($paramsTab["ID_TAB"], $request["select"]);
+	}
 }
 if($paramsTab["ID_TAB"] == "new")
 {
